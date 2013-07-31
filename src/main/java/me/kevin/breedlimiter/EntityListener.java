@@ -3,12 +3,14 @@ package me.kevin.breedlimiter;
 import org.bukkit.Material;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 
 public class EntityListener implements Listener {
@@ -46,6 +48,18 @@ public class EntityListener implements Listener {
             }
         }
     }
+    
+    @EventHandler
+    public void onPlayerEggThrow(PlayerEggThrowEvent event) {
+        if (!event.isHatching()) {
+            if (event.getHatchingType() == EntityType.CHICKEN) {
+                if (!canSpawn(event.getPlayer(), EntityType.CHICKEN)) {
+                    event.setHatching(false);
+                    event.getPlayer().sendMessage(main.errorMessage);
+                }
+            }
+        }
+    }
 
     public boolean canSpawn(LivingEntity ent) {
         Integer spawnrate = main.mobrestrictions.get(ent.getType());
@@ -54,6 +68,20 @@ public class EntityListener implements Listener {
         
         for (Entity en : ent.getNearbyEntities(main.radius, main.radius, main.radius)){
             if (en.getType() == ent.getType()) {
+                count ++;
+            }
+        }
+
+        return spawnrate == null || count <= spawnrate;
+    }
+
+    public boolean canSpawn(LivingEntity ent, EntityType entitytype) {
+        Integer spawnrate = main.mobrestrictions.get(entitytype);
+        
+        int count = 0;
+        
+        for (Entity en : ent.getNearbyEntities(main.radius, main.radius, main.radius)){
+            if (en.getType() == entitytype) {
                 count ++;
             }
         }
