@@ -24,10 +24,11 @@ public class EntityListener implements Listener {
                 && event.getRightClicked() instanceof LivingEntity) {
             LivingEntity living = (LivingEntity)event.getRightClicked();
             if (!canSpawn(living)) {
-                Material mat = main.mobinfo.get(living.getType());
-                if (mat != null && event.getPlayer().getItemInHand().getType() == mat) {
-                    event.setCancelled(true);
-                    event.getPlayer().sendMessage(main.errorMessage);
+                for (Material mat : main.mobinfo.get(living.getType())) {
+                    if (mat != null && event.getPlayer().getItemInHand().getType() == mat) {
+                        event.setCancelled(true);
+                        event.getPlayer().sendMessage(main.errorMessage);
+                    }
                 }
             }
         }
